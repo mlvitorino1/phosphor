@@ -25,7 +25,7 @@
     "country-list": "^2.4.1",
     "country-list-js": "^4.0.0",
     "fast-xml-parser": "^5.11.2",
-    "lucide-react": "^0.468.0",
+    "lucide-react": "^1.49.0",
     "maplibre-gl": "^6.11.2",
     "next": "16.3.8",
     "postgres": "^3.4.9",
