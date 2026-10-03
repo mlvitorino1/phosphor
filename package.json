@@ -35,7 +35,7 @@
     "server-only": "^0.0.1",
     "tldts": "^7.4.16",
     "yauzl": "^3.4.0",
-    "zod": "^4.1.12"
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@types/country-list": "^2.1.4",
