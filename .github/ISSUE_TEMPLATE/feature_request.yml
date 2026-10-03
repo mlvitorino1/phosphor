@@ -1,0 +1,10 @@
+name: Propor uma melhoria
+description: Sugira uma melhoria com um caso de uso concreto.
+body:
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Problema e proposta
+      description: Quem usaria a melhoria, qual problema ela resolve e como verificar o resultado?
+    validations:
+      required: true

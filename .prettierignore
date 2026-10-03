@@ -1,0 +1,10 @@
+node_modules/
+.next/
+coverage/
+data/
+public/history/
+public/maplibre/
+package-lock.json
+next-env.d.ts
+AGENTS.md
+CLAUDE.md

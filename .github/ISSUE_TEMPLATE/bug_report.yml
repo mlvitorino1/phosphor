@@ -1,0 +1,21 @@
+name: Relatar um problema
+description: Descreva um comportamento incorreto e como reproduzi-lo.
+labels: [bug]
+body:
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Passos para reproduzir
+      description: Inclua a página, a ação, o resultado esperado e o resultado observado.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Ambiente
+      description: Sistema, navegador, versão do Node e mensagem de erro sem dados pessoais ou credenciais.
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidências
+      description: Capturas e logs sem senhas, tokens ou e-mails pessoais.
