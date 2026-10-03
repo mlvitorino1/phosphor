@@ -87,10 +87,10 @@ async function postWebhook(url: string, body: object, token?: string) {
   if (!response.ok) throw new Error(`Webhook respondeu HTTP ${response.status}`);
 }
 export async function dispatchNewsAlerts(origin: string) {
+  await pruneDeliveries();
   if (!emailConfigured() && !process.env.SLACK_WEBHOOK_URL && !process.env.ERP_WEBHOOK_URL)
     return { evaluated: 0, sent: 0, errors: 0 };
   const publicOrigin = emailLinkOrigin(origin);
-  await pruneDeliveries();
   const all = (await getNewsCandidates()).items;
   const recent = all.filter(
     (item) =>
