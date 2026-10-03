@@ -319,7 +319,7 @@ async function fetchFeeds(): Promise<FeedResult> {
       available.push(activeSources[index].name);
     } else {
       unavailable.push(activeSources[index].name);
-      console.error(`${activeSources[index].name} indisponível:`, result.reason);
+      logFailure(`${activeSources[index].name} indisponível`, result.reason);
     }
   });
   return {
@@ -397,3 +397,4 @@ export async function setSourceEnabled(name: string, enabled: boolean) {
   resetFeedCache();
   return true;
 }
+import { logFailure } from "./safe-log";

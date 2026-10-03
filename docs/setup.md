@@ -26,7 +26,7 @@ Não há ferramenta para transferir automaticamente contas do JSON local para Po
 | `ADMIN_PASSWORD`                       | Senha administrativa de 12 a 256 caracteres. Nome de entrada: Marcus.             |
 | `ADMIN_SESSION_SECRET`                 | Segredo administrativo exclusivo, mínimo de 32 caracteres.                        |
 | `USER_SESSION_SECRET`                  | Segredo exclusivo para contas públicas, mínimo de 32 caracteres.                  |
-| `CRON_SECRET`                          | Autorização da captura agendada.                                                  |
+| `CRON_SECRET`                          | Segredo exclusivo de pelo menos 32 caracteres para a captura agendada.            |
 | `PUBLIC_APP_URL`                       | Origem HTTPS pública, sem caminho/query, para recuperação, verificação e alertas. |
 | `FIRMS_MAP_KEY`                        | Ativa observações de focos de calor da NASA FIRMS.                                |
 | `OPENAI_API_KEY`, `OPENAI_MODEL`       | Extração assistida pelo modelo escolhido pelo operador.                           |
@@ -36,6 +36,8 @@ Não há ferramenta para transferir automaticamente contas do JSON local para Po
 | `TEST_DATABASE_URL`                    | Somente testes, obrigatoriamente apontando a `phosphor_test`.                     |
 
 Gere segredos aleatórios exclusivos; nunca reutilize a senha como segredo de sessão. A rotação de senha ou segredo invalida cookies anteriores.
+
+Credenciais de APIs e webhooks são lidas apenas no servidor; não use o prefixo `NEXT_PUBLIC_` para elas. O nome de entrada Marcus é público, mas a senha administrativa é definida pelo operador. Veja [segurança](../SECURITY.md) para a verificação antes de publicar e a rotação de credenciais.
 
 ## Hospedagem
 

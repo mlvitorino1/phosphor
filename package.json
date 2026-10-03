@@ -15,7 +15,9 @@
     "format:check": "prettier . --check",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check": "npm run format:check && npm run lint && npm run typecheck && npm test",
+    "security:files": "node scripts/check-publication.mjs",
+    "security:scan": "gitleaks git . --redact --log-opts=--all --no-banner",
+    "check": "npm run security:files && npm run format:check && npm run lint && npm run typecheck && npm test",
     "db:migrate": "node --env-file-if-exists=.env.local scripts/db-migrate.mjs"
   },
   "dependencies": {

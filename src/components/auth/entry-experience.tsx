@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { ArrowRight, LockKeyhole, MapPin, ShieldCheck, Sparkles } from "lucide-react";
 import type { PublicUser } from "@/lib/domain/accounts";
+import { readAccountTokens } from "@/lib/domain/account-links";
 
 export type EntryStage = "auth" | "location" | "welcome" | "reveal" | "complete";
 type Mode = "login" | "register" | "forgot" | "reset";
@@ -12,8 +13,6 @@ export type EntryLocation = { lat: number; lng: number } | null;
 export function EntryExperience({
   stage,
   user,
-  resetToken,
-  verifyToken,
   progress,
   total,
   onStage,
@@ -22,15 +21,14 @@ export function EntryExperience({
 }: {
   stage: EntryStage;
   user: PublicUser | null;
-  resetToken: string;
-  verifyToken: string;
   progress: number;
   total: number;
   onStage: (stage: EntryStage) => void;
   onUser: (user: PublicUser) => void;
   onLocation: (location: EntryLocation) => void;
 }) {
-  const [mode, setMode] = useState<Mode>(resetToken ? "reset" : "login");
+  const [mode, setMode] = useState<Mode>("login");
+  const [resetToken, setResetToken] = useState("");
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -39,28 +37,50 @@ export function EntryExperience({
   const [notice, setNotice] = useState("");
 
   useEffect(() => {
-    if (!verifyToken) return;
     let active = true;
-    fetch("/api/account/verify", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: verifyToken }),
-    })
-      .then(async (response) => {
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || "Falha na confirmação");
-        if (active) {
-          setNotice("E-mail confirmado. Você já pode ativar alertas.");
-          window.history.replaceState(null, "", "/mapa?entrar=1");
-        }
+    let revision = 0;
+    const readLink = () => {
+      if (!active) return;
+      const fragment = window.location.hash;
+      if (!fragment.includes("redefinir=") && !fragment.includes("verificar=")) return;
+      const tokens = readAccountTokens(fragment);
+      const current = ++revision;
+      // Remove secrets before later requests; keep a reset token only in component memory.
+      window.history.replaceState(null, "", "/mapa?entrar=1");
+      onStage("auth");
+      setResetToken(tokens.resetToken);
+      setMode(tokens.resetToken ? "reset" : "login");
+      setError("");
+      setNotice("");
+      if (!tokens.resetToken && !tokens.verifyToken) {
+        setError("Link inválido ou expirado. Solicite um novo link.");
+      }
+      if (!tokens.verifyToken) return;
+      void fetch("/api/account/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: tokens.verifyToken }),
       })
-      .catch((cause) => {
-        if (active) setError(cause instanceof Error ? cause.message : "Falha na confirmação");
-      });
+        .then(async (response) => {
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || "Falha na confirmação");
+          if (active && revision === current)
+            setNotice("E-mail confirmado. Você já pode ativar alertas.");
+        })
+        .catch((cause) => {
+          if (active && revision === current)
+            setError(cause instanceof Error ? cause.message : "Falha na confirmação");
+        });
+    };
+    // Defer past Strict Mode cleanup so one-use tokens are sent once.
+    queueMicrotask(readLink);
+    // Opening another email link can change only the fragment on the same mounted map.
+    window.addEventListener("hashchange", readLink);
     return () => {
       active = false;
+      window.removeEventListener("hashchange", readLink);
     };
-  }, [verifyToken]);
+  }, [onStage]);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -90,6 +110,7 @@ export function EntryExperience({
         return;
       }
       if (mode === "reset") {
+        setResetToken("");
         setMode("login");
         setPassword("");
         setNotice("Senha atualizada. Entre com seus dados.");

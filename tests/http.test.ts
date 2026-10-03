@@ -1,5 +1,5 @@
 import { expect, it, vi } from "vitest";
-import { readResponseText } from "@/lib/server/http";
+import { readResponseText, SourceRequestError, sourceFailureSummary } from "@/lib/server/http";
 import { withApiErrors } from "@/lib/server/api-handler";
 import { UserInputError } from "@/lib/domain/errors";
 
@@ -27,4 +27,10 @@ it("returns deliberate validation messages", async () => {
   })();
   expect(result.status).toBe(422);
   expect(await result.json()).toEqual({ error: "Confirme seu e-mail" });
+});
+
+it("shows controlled source statuses without echoing unexpected provider messages", () => {
+  expect(sourceFailureSummary(new SourceRequestError(429))).toContain("limite");
+  expect(sourceFailureSummary(new SourceRequestError(503))).toBe("HTTP 503");
+  expect(sourceFailureSummary(new Error("private-provider-credential"))).not.toContain("private");
 });

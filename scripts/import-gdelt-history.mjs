@@ -218,8 +218,10 @@ try {
   console.log(
     `${records.length} registros selecionados de ${eligible} elegíveis (${scanned} linhas). Salvo em public/history/${key}.json`,
   );
-} catch (error) {
-  console.error(error instanceof Error ? error.message : error);
+} catch {
+  console.error(
+    "Falha na importação. Confira o período, a disponibilidade do arquivo oficial e os limites de tamanho.",
+  );
   process.exitCode = 1;
 } finally {
   await fs.rm(tempPath, { force: true });

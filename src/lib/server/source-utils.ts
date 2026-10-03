@@ -1,4 +1,4 @@
-import { readResponseText } from "./http";
+import { readResponseText, SourceRequestError } from "./http";
 import "server-only";
 import country from "country-list-js";
 import { XMLParser } from "fast-xml-parser";
@@ -48,7 +48,7 @@ export async function fetchText(
     signal: AbortSignal.timeout(12000),
     headers: { Accept: accept, "User-Agent": "Phosphor/0.2 (public event monitor)" },
   });
-  if (!response.ok) throw new Error(`${new URL(url).hostname}: HTTP ${response.status}`);
+  if (!response.ok) throw new SourceRequestError(response.status);
   return readResponseText(response);
 }
 export async function fetchJson<T>(url: string, revalidate = 300): Promise<T> {

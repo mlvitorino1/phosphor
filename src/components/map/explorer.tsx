@@ -39,8 +39,6 @@ export function Explorer({
   initialUser = null,
   admin = false,
   entryRequested = false,
-  resetToken = "",
-  verifyToken = "",
 }: {
   initial: EventRecord[];
   available: string[];
@@ -49,13 +47,11 @@ export function Explorer({
   initialUser?: PublicUser | null;
   admin?: boolean;
   entryRequested?: boolean;
-  resetToken?: string;
-  verifyToken?: string;
 }) {
   const [events, setEvents] = useState(initial);
   const [user, setUser] = useState(initialUser);
   const [entryStage, setEntryStage] = useState<EntryStage>(
-    entryRequested ? (initialUser && !resetToken ? "location" : "auth") : "complete",
+    entryRequested ? (initialUser ? "location" : "auth") : "complete",
   );
   const [entryLocation, setEntryLocation] = useState<EntryLocation>(null);
   const [visibleCount, setVisibleCount] = useState(entryRequested ? 0 : Number.POSITIVE_INFINITY);
@@ -502,8 +498,6 @@ export function Explorer({
       <EntryExperience
         stage={entryStage}
         user={user}
-        resetToken={resetToken}
-        verifyToken={verifyToken}
         progress={displayed.length}
         total={filtered.length}
         onStage={setEntryStage}

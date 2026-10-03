@@ -1,0 +1,32 @@
+title = "Phosphor secret protection"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "phosphor-server-secret"
+description = "Nonempty literal values assigned to Phosphor server credentials"
+regex = '''(?i)(?:ADMIN_PASSWORD|ADMIN_SESSION_SECRET|USER_SESSION_SECRET|CRON_SECRET|ERP_WEBHOOK_TOKEN|FIRMS_MAP_KEY|OPENAI_API_KEY|RESEND_API_KEY)[ \t]*=[ \t]*["']?([^\s"';`$]{8,})'''
+secretGroup = 1
+keywords = ["admin_password", "admin_session_secret", "user_session_secret", "cron_secret", "erp_webhook_token", "firms_map_key", "openai_api_key", "resend_api_key"]
+
+[[rules]]
+id = "database-credential-url"
+description = "Passwords embedded in database connection URLs"
+regex = '''(?i)(?:postgres(?:ql)?|mysql|mongodb(?:\+srv)?)://[^:\s/]+:([^@\s]+)@'''
+secretGroup = 1
+keywords = ["postgres://", "postgresql://", "mysql://", "mongodb://", "mongodb+srv://"]
+
+[[rules.allowlists]]
+description = "Only documented disposable local test credentials"
+condition = "AND"
+paths = ['''^\.github/workflows/ci\.yml$''', '''^docs/setup\.md$''']
+regexTarget = "secret"
+regexes = ['''^(test-only-password|password)$''']
+
+[[rules.allowlists]]
+description = "Only the historical synthetic connection fixtures used in auth and error tests"
+condition = "AND"
+paths = ['''^tests/admin-auth\.test\.ts$''', '''^tests/http\.test\.ts$''']
+regexTarget = "secret"
+regexes = ['''^(test|secret)$''']

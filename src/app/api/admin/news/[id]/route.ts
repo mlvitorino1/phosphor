@@ -63,12 +63,11 @@ export const PATCH = withApiErrors(async function PATCH(
   const item = await reviewNews(id, review);
   if (item?.status === "approved")
     await dispatchNewsAlerts(request.nextUrl.origin).catch((error) =>
-      console.error("Falha nos alertas após aprovação:", {
-        type: error instanceof Error ? error.name : "Unknown",
-      }),
+      logFailure("Falha nos alertas após aprovação", error),
     );
   return NextResponse.json(
     item ? { ok: true, item } : { error: "Notícia indisponível ou revisão incompleta" },
     { status: item ? 200 : 422 },
   );
 });
+import { logFailure } from "@/lib/server/safe-log";

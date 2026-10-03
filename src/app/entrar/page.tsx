@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { legacyAccountPath } from "@/lib/domain/account-links";
 
 export const metadata: Metadata = { title: "Entrar", robots: { index: false, follow: false } };
 export default async function EntryPage({
@@ -8,8 +9,5 @@ export default async function EntryPage({
   searchParams: Promise<{ redefinir?: string; verificar?: string }>;
 }) {
   const params = await searchParams;
-  const query = new URLSearchParams({ entrar: "1" });
-  if (typeof params.redefinir === "string") query.set("redefinir", params.redefinir);
-  if (typeof params.verificar === "string") query.set("verificar", params.verificar);
-  redirect(`/mapa?${query}`);
+  redirect(legacyAccountPath(params));
 }

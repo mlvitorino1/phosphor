@@ -1,4 +1,5 @@
 import "server-only";
+import { readResponseText } from "./http";
 import country from "country-list-js";
 import type { EventRecord } from "@/lib/domain/types";
 import {
@@ -8,7 +9,6 @@ import {
   countryPoint,
   date,
   fetchJson,
-  fetchText,
   fetchXml,
   finite,
   impactFromSeverity,
@@ -385,11 +385,18 @@ export function firmsConfigured() {
 export async function firms(): Promise<EventRecord[]> {
   const key = process.env.FIRMS_MAP_KEY;
   if (!key) return [];
-  const csv = await fetchText(
+  // This provider puts its key in the URL: refuse redirects and persistent fetch caching.
+  const response = await fetch(
     `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${encodeURIComponent(key)}/VIIRS_NOAA21_NRT/world/1`,
-    900,
-    "text/csv",
+    {
+      cache: "no-store",
+      redirect: "error",
+      signal: AbortSignal.timeout(12000),
+      headers: { Accept: "text/csv" },
+    },
   );
+  if (!response.ok) throw new Error(`NASA FIRMS: HTTP ${response.status}`);
+  const csv = await readResponseText(response);
   const lines = csv.trim().split(/\r?\n/),
     header = lines.shift()?.split(",") ?? [];
   const indexes = Object.fromEntries(header.map((name, i) => [name, i]));

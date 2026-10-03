@@ -6,6 +6,7 @@ import { HeroGlobe } from "@/components/map/hero-globe";
 import { getEvents } from "@/lib/server/store";
 import { EventCard } from "@/components/map/event-card";
 import { Brand } from "@/components/layout/brand";
+import { SignalClue } from "@/components/portfolio/recruiter-easter-eggs";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
@@ -166,6 +167,7 @@ export default async function Home() {
       <footer className="footer wrap">
         <Brand compact />
         <span>Informações sujeitas à atualização pelas fontes.</span>
+        <SignalClue />
       </footer>
     </>
   );

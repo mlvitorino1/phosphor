@@ -12,6 +12,7 @@ import {
   setUserCookie,
 } from "@/lib/server/user-auth";
 import { emailConfigured } from "@/lib/server/email";
+import { logFailure } from "@/lib/server/safe-log";
 
 export const POST = withApiErrors(async function POST(request: NextRequest) {
   if (!(await sameOrigin()))
@@ -37,9 +38,7 @@ export const POST = withApiErrors(async function POST(request: NextRequest) {
         await requestEmailVerification(user.id, emailLinkOrigin(request.nextUrl.origin));
         verificationSent = true;
       } catch (error) {
-        console.error("Falha no e-mail de verificação:", {
-          type: error instanceof Error ? error.name : "Unknown",
-        });
+        logFailure("Falha no e-mail de verificação", error);
       }
     return NextResponse.json(
       { user, verificationSent },

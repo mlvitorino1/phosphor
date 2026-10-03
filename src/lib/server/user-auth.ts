@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 import { db, ensureSchema } from "@/lib/server/database";
 import { readLocalState, writeLocalState, type UserAccount } from "@/lib/server/local-state";
 import { emailConfigured, sendEmail } from "@/lib/server/email";
+import { accountLinkPath } from "@/lib/domain/account-links";
 
 const COOKIE = "gem_user";
 const SESSION_SECONDS = 14 * 86400;
@@ -162,7 +163,7 @@ export async function clearUserCookie() {
   (await cookies()).delete(COOKIE);
 }
 export async function currentUser(): Promise<PublicUser | null> {
-  if (!configured() || !secret()) return null;
+  if (!configured() || secret().length < 32) return null;
   const token = (await cookies()).get(COOKIE)?.value ?? "";
   const parts = token.split(".");
   if (parts.length !== 3) return null;
@@ -192,7 +193,7 @@ export async function createResetLink(rawEmail: string, origin: string) {
     account.resetExpiresAt = expires.toISOString();
     writeLocalState(state);
   }
-  const link = `${origin}/mapa?entrar=1&redefinir=${encodeURIComponent(token)}`;
+  const link = `${origin}${accountLinkPath("redefinir", token)}`;
   await sendEmail(
     user.email,
     "Redefinir senha · Phosphor",
@@ -246,7 +247,7 @@ export async function requestEmailVerification(userId: string, origin: string) {
   await sendEmail(
     user.email,
     "Confirme seu e-mail · Phosphor",
-    `Confirme seu e-mail para ativar alertas:\n\n${origin}/mapa?entrar=1&verificar=${token}\n\nEste link expira em 24 horas.`,
+    `Confirme seu e-mail para ativar alertas:\n\n${origin}${accountLinkPath("verificar", token)}\n\nEste link expira em 24 horas.`,
   );
 }
 export async function verifyUserEmail(token: string) {

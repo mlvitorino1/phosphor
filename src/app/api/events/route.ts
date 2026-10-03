@@ -1,6 +1,7 @@
 import { withApiErrors } from "@/lib/server/api-handler";
 import { NextResponse } from "next/server";
 import { getEvents } from "@/lib/server/store";
+import { logFailure } from "@/lib/server/safe-log";
 
 export const dynamic = "force-dynamic";
 export const GET = withApiErrors(async function GET() {
@@ -11,9 +12,7 @@ export const GET = withApiErrors(async function GET() {
       headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=240" },
     });
   } catch (error) {
-    console.error("Eventos indisponíveis:", {
-      type: error instanceof Error ? error.name : "Unknown",
-    });
+    logFailure("Eventos indisponíveis", error);
     return NextResponse.json(
       {
         events: [],

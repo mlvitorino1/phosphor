@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { legacyAccountPath } from "@/lib/domain/account-links";
 import { Explorer } from "@/components/map/explorer";
 import { getEvents } from "@/lib/server/store";
 import { currentUser } from "@/lib/server/user-auth";
@@ -13,7 +15,10 @@ export default async function MapPage({
 }: {
   searchParams: Promise<{ entrar?: string; redefinir?: string; verificar?: string }>;
 }) {
-  const [feed, user, admin, params] = await Promise.all([
+  const params = await searchParams;
+  if (params.redefinir !== undefined || params.verificar !== undefined)
+    redirect(legacyAccountPath(params));
+  const [feed, user, admin] = await Promise.all([
     getEvents().catch(() => ({
       events: [],
       available: [],
@@ -22,10 +27,7 @@ export default async function MapPage({
     })),
     currentUser(),
     isAdmin(),
-    searchParams,
   ]);
-  const resetToken = typeof params.redefinir === "string" ? params.redefinir : "";
-  const verifyToken = typeof params.verificar === "string" ? params.verificar : "";
   return (
     <Explorer
       initial={feed.events}
@@ -34,9 +36,7 @@ export default async function MapPage({
       fetchedAt={feed.fetchedAt}
       initialUser={user}
       admin={admin}
-      entryRequested={params.entrar === "1" || Boolean(resetToken || verifyToken)}
-      resetToken={resetToken}
-      verifyToken={verifyToken}
+      entryRequested={params.entrar === "1"}
     />
   );
 }

@@ -31,9 +31,8 @@ export const PATCH = withApiErrors(async function PATCH(
   try {
     return NextResponse.json({ ok: await updateEvent(id, parsed.data) });
   } catch (error) {
-    console.error("Erro administrativo:", {
-      type: error instanceof Error ? error.name : "Unknown",
-    });
+    logFailure("Erro administrativo", error);
     return NextResponse.json({ error: "Não foi possível salvar" }, { status: 500 });
   }
 });
+import { logFailure } from "@/lib/server/safe-log";

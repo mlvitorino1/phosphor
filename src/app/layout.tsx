@@ -4,6 +4,8 @@ import "./globals.css";
 import "./admin.css";
 import "./news-panel.css";
 import "./phosphor.css";
+import "./easter-eggs.css";
+import { RecruiterEasterEggs } from "@/components/portfolio/recruiter-easter-eggs";
 
 export const metadata: Metadata = {
   applicationName: "Phosphor",
@@ -16,7 +18,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR" data-scroll-behavior="smooth">
-      <body>{children}</body>
+      <body>
+        {children}
+        <RecruiterEasterEggs />
+      </body>
     </html>
   );
 }

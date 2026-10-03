@@ -5,6 +5,7 @@ import { z } from "zod";
 import { isAdmin, sameOrigin } from "@/lib/server/auth";
 import { batchNewsAction } from "@/lib/server/news";
 import { dispatchNewsAlerts } from "@/lib/server/alerts";
+import { logFailure } from "@/lib/server/safe-log";
 
 const schema = z
   .object({
@@ -24,9 +25,7 @@ export const POST = withApiErrors(async function POST(request: NextRequest) {
   const result = await batchNewsAction(parsed.data.ids, parsed.data.action);
   if (parsed.data.action === "approve" && result.changed.length)
     await dispatchNewsAlerts(request.nextUrl.origin).catch((error) =>
-      console.error("Falha nos alertas após aprovação em lote:", {
-        type: error instanceof Error ? error.name : "Unknown",
-      }),
+      logFailure("Falha nos alertas após aprovação em lote", error),
     );
   return NextResponse.json(result);
 });

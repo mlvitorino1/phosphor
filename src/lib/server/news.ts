@@ -229,10 +229,7 @@ async function performCapture(force = false) {
           signal: AbortSignal.timeout(18000),
           headers: { Accept: "application/json", "User-Agent": "Phosphor/0.1 (news discovery)" },
         });
-        if (!response.ok)
-          throw new Error(
-            response.status === 429 ? "limite temporário de consultas" : `HTTP ${response.status}`,
-          );
+        if (!response.ok) throw new SourceRequestError(response.status);
         const data = JSON.parse(await readResponseText(response, 2_000_000)) as {
           articles?: GdeltArticle[];
         };
@@ -242,9 +239,7 @@ async function performCapture(force = false) {
     );
     results.forEach((result, index) => {
       if (result.status === "rejected") {
-        errors.push(
-          `${searches[index].name}: ${result.reason instanceof Error ? result.reason.message : "falha na consulta"}`,
-        );
+        errors.push(`${searches[index].name}: ${sourceFailureSummary(result.reason)}`);
         return;
       }
       for (const article of result.value.articles) {
@@ -265,9 +260,7 @@ async function performCapture(force = false) {
   const crawls = await crawlsPromise;
   for (const crawl of crawls) {
     if (crawl.status === "rejected") {
-      errors.push(
-        crawl.reason instanceof Error ? crawl.reason.message : "Falha no rastreador de notícias.",
-      );
+      errors.push(sourceFailureSummary(crawl.reason));
       continue;
     }
     const { source, result } = crawl.value;
@@ -531,3 +524,4 @@ function sameReviewedNews(a: EventRecord, b: EventRecord) {
   const common = [...left].filter((word) => right.has(word)).length;
   return common >= 2 && common / Math.max(left.size, right.size) >= 0.65;
 }
+import { SourceRequestError, sourceFailureSummary } from "./http";

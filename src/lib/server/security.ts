@@ -15,6 +15,12 @@ export function equalSecrets(actual: string, expected: string): boolean {
   return timingSafeEqual(digest(actual), digest(expected));
 }
 
+export function validBearer(header: string | null, secret: string | undefined): boolean {
+  return Boolean(
+    secret && secret.length >= 32 && header && equalSecrets(header, `Bearer ${secret}`),
+  );
+}
+
 /** Binding a session to the password hash revokes it after a password reset. */
 export function signSession(payload: string, secret: string, credential: string): string {
   if (secret.length < 32) throw new Error("O segredo de sessão deve ter pelo menos 32 caracteres");

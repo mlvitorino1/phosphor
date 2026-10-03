@@ -60,7 +60,7 @@ As migrações são aplicadas uma vez, em transação, e verificadas por checksu
 ## Qualidade
 
 ```bash
-npm run check     # formatação, lint, tipos e testes
+npm run check     # arquivos públicos, formatação, lint, tipos e testes
 npm run build     # compilação de produção
 npm run test:watch
 npm run format   # aplicar o padrão de formatação
@@ -100,6 +100,10 @@ As fronteiras de servidor usam `server-only`: segredos e acesso ao disco não po
 - A entrega de alertas usa registro de tentativa, sem uma fila durável; uma interrupção entre a reserva e o envio pode exigir recuperação manual.
 
 Leia a [arquitetura](docs/architecture.md), o [guia de configuração](docs/setup.md), as [limitações e fontes](docs/features.md) e a [política de segurança](SECURITY.md).
+
+## Para quem avalia o projeto
+
+Há dois sinais escondidos para recrutadores: um dossiê de decisões técnicas e um desafio de agrupamento de relatos. O elemento 15 recompensa a observação. O [guia dos easter eggs](docs/easter-eggs.md) contém os caminhos, critérios e uma resposta para verificação.
 
 ## Contribuir
 

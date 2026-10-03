@@ -7,6 +7,7 @@ import { isNewsVisible } from "@/lib/domain/news-deadlines";
 import { assessNews } from "@/lib/domain/news-intelligence";
 import { alertSubscribers, emailLinkOrigin } from "@/lib/server/user-auth";
 import { emailConfigured, sendEmail } from "@/lib/server/email";
+import { logFailure } from "./safe-log";
 
 function deliveryKey(channel: string, recipient: string, id: string) {
   return createHash("sha256").update(`${channel}:${recipient}:${id}`).digest("hex");
@@ -126,7 +127,7 @@ export async function dispatchNewsAlerts(origin: string) {
           sent++;
       } catch (error) {
         errors++;
-        console.error("Falha no alerta por e-mail:", error);
+        logFailure("Falha no alerta por e-mail", error);
       }
     }
     if (assessment.supplyChain && assessment.latam && assessment.riskScore >= 60) {
@@ -142,7 +143,7 @@ export async function dispatchNewsAlerts(origin: string) {
             sent++;
         } catch (error) {
           errors++;
-          console.error("Falha no alerta Slack:", error);
+          logFailure("Falha no alerta Slack", error);
         }
       if (process.env.ERP_WEBHOOK_URL)
         try {
@@ -172,7 +173,7 @@ export async function dispatchNewsAlerts(origin: string) {
             sent++;
         } catch (error) {
           errors++;
-          console.error("Falha no alerta ERP:", error);
+          logFailure("Falha no alerta ERP", error);
         }
     }
   }

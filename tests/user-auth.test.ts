@@ -60,3 +60,10 @@ it("revokes an existing cookie when a one-use reset changes the password", async
   expect(await authenticateUser(user.email, "original-password")).toBeNull();
   expect(await authenticateUser(user.email, "replacement-password")).toEqual(user);
 });
+
+it("fails closed when a session secret is shortened after login", async () => {
+  const user = await registerUser("test@example.org", "strong-user-password", "Test User");
+  await setUserCookie(user);
+  vi.stubEnv("USER_SESSION_SECRET", "short");
+  expect(await currentUser()).toBeNull();
+});

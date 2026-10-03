@@ -108,7 +108,7 @@ async function fetchText(url: string, accept: string) {
     signal: AbortSignal.timeout(10000),
     headers: { Accept: accept, "User-Agent": "Phosphor/0.1 (public news discovery)" },
   });
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  if (!response.ok) throw new SourceRequestError(response.status);
   return readResponseText(response, 2_000_000);
 }
 
@@ -245,9 +245,10 @@ export async function crawlNews(source: CrawlSource) {
     errors: results.flatMap((result, index) =>
       result.status === "rejected"
         ? [
-            `${index < source.feeds.length ? "RSS" : "Seção"}: ${result.reason instanceof Error ? result.reason.message : "falha"}`,
+            `${index < source.feeds.length ? "RSS" : "Seção"}: ${sourceFailureSummary(result.reason)}`,
           ]
         : [],
     ),
   };
 }
+import { SourceRequestError, sourceFailureSummary } from "./http";
